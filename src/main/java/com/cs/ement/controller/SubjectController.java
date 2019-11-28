@@ -1,0 +1,56 @@
+package com.cs.ement.controller;
+
+import java.util.List;
+import java.util.Optional;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import com.cs.ement.domain.Subject;
+import com.cs.ement.repository.SubjectRepository;
+
+@RestController
+@RequestMapping("/subjects")
+public class SubjectController {
+	
+	@Autowired
+	SubjectRepository subjectRepo;
+	
+	@GetMapping
+	public ResponseEntity<List<Subject>> getSubjects() {
+		List<Subject> subjects =  subjectRepo.findAll();
+		if(subjects.isEmpty()) {
+			return ResponseEntity.status(HttpStatus.NO_CONTENT).body(subjects);
+		}
+		return ResponseEntity.status(HttpStatus.OK).body(subjects);	
+		
+	}
+	
+	@PostMapping("/add")
+	public ResponseEntity<Subject> addSubject(@RequestBody Subject subject) {
+		subject.setStatus(1);
+		subjectRepo.save(subject);
+		
+		return ResponseEntity.status(HttpStatus.CREATED).body(subject);
+	}
+	
+	@PutMapping("/edit/{subjectCode}")
+	public ResponseEntity<Subject> updateSubject(@RequestBody Subject updatedSubject, @PathVariable String subjectCode) {
+		Optional<Subject> subject = subjectRepo.findBySubjectCode(subjectCode);
+		
+		if(!subject.isPresent())
+			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(updatedSubject);
+		
+		subjectRepo.save(updatedSubject);
+		return ResponseEntity.status(HttpStatus.OK).body(updatedSubject);
+	}
+	
+}
