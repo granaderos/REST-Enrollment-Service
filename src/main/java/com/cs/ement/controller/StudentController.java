@@ -12,18 +12,18 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.cs.ement.domain.Student;
-import com.cs.ement.repository.StudentRepository;
+import com.cs.ement.service.StudentService;
 
 @RestController
 @RequestMapping("/students")
 public class StudentController {
 	
 	@Autowired
-	StudentRepository studentRepo;
+	StudentService studentService;
 	
 	@GetMapping
 	public ResponseEntity<List<Student>> getStudents() {
-		List<Student> students = studentRepo.findAll();
+		List<Student> students = studentService.findAll();
 		if(students.isEmpty()) 
 			return ResponseEntity.status(HttpStatus.NO_CONTENT).body(students);
 		return ResponseEntity.status(HttpStatus.OK).body(students); 
@@ -32,7 +32,7 @@ public class StudentController {
 	
 	@PostMapping("/add")
 	public ResponseEntity<Student> addStudent(@RequestBody Student student) {
-		studentRepo.save(student);
+		studentService.save(student);
 		return ResponseEntity.status(HttpStatus.CREATED).body(student);
 	}
 	
